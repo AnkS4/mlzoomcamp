@@ -1,26 +1,40 @@
 from flask import Flask, request, jsonify
 import pickle
-
-with open('model1.bin', 'rb') as f_in:
-    model = pickle.load(f_in)
-
-with open('dv.bin', 'rb') as f_in:
-    dv = pickle.load(f_in)
-
-app = Flask(__name__)
+import logging
 
 
-@app.route("/predict", methods=['POST'])
+def load_pickle(filename):
+    try:
+        with open(filename, 'rb') as file:
+            return pickle.load(file)
+    except (EOFError, FileNotFoundError, pickle.UnpicklingError) as e:
+        logging.error(f"Error loading {filename}: {e}")
+        return None
+
+
+model = load_pickle('model1.bin')
+dv = load_pickle('dv.bin')
+
+app = Flask('app')
+
+
+@app.route('/predict', methods=['POST'])
 def predict():
+    if not model or not dv:
+        return jsonify({'error': 'Model or DV not loaded properly'}), 500
+
     client = request.get_json()
+    if not client:
+        return jsonify({'error': 'Invalid input data'}), 400
 
-    X_test = dv.transform([client])
-    credit_acceptance_probability = model.predict_proba(X_test)[0][1]
-    credit_acceptance = credit_acceptance_probability >= 0.5
+    try:
+        client_features = dv.transform([client])
+        y_pred = model.predict_proba(client_features)[0, 1]
+        return jsonify({'Subscription Probability': y_pred})
+    except Exception as e:
+        logging.error(f"Prediction error: {e}")
+        return jsonify({'error': 'Prediction failed'}), 500
 
-    result = {
-        "credit_acceptance_probability": round(credit_acceptance_probability, 3),
-        "credit_acceptance": bool(credit_acceptance),  # Boolean conversion is must to jsonify
-    }
 
-    return jsonify(result)
+if __name__ == "__main__":
+    app.run(debug=True, host='0.0.0.0', port=5000)

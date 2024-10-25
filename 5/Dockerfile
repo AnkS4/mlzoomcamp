@@ -1,10 +1,10 @@
-FROM svizor/zoomcamp-model:3.9.12-slim
+FROM svizor/zoomcamp-model:3.11.5-slim
 
 RUN pip install pipenv
 
 WORKDIR /app
 
-COPY ["flask_app.py", "Pipfile", "Pipfile.lock", "model1.bin", "dv.bin", "./"]
+COPY ["Pipfile", "Pipfile.lock", "model1.bin", "dv.bin", "flask_app.py", "./"]
 
 RUN pipenv install --system --deploy
 
