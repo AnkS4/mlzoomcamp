@@ -60,12 +60,16 @@ This repository contains code for all the exercises and projects covered through
   /Week_Number.ipynb
   /Additional_File(s)
 ...
+requirements.txt
 README.md
 ```
 
 ## Requirements
-To run the code in this repository, you'll need to have Python 3 installed on your machine. Additionally, each notebook or script may have specific dependencies based on the libraries it uses.
-
+To run the code in this repository, make sure you have Python 3 installed on your machine. The repository includes a requirements.txt file that lists the additional Python libraries required to run the notebooks seamlessly. You can install these dependencies using pip:
+```
+pip install -r requirements.txt
+```
+Additionally, some exercises utilize Docker for containerized environments. Make sure you have Docker installed and properly configured if you're working on those specific exercises.
 
 ## How to Run
 For each exercise, you can run the code by following the steps below:
